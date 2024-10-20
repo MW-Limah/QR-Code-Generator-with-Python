@@ -21,12 +21,12 @@ def generate_qr():
     qr.add_data(data)
     qr.make(fit=True)
     img = qr.make_image(fill_color="black", back_color="white")
-
-    img_byte_arr = io.BytesIO()
-    img.save(img_byte_arr, format='PNG')
-    img_byte_arr.seek(0)
-
-    return send_file(img_byte_arr, mimetype='image/png', as_attachment=True, download_name='qrcode.png')
+    
+    img_bytes = io.BytesIO()
+    img.save(img_bytes, format='PNG')
+    img_bytes.seek(0)
+    
+    return send_file(img_bytes, mimetype='image/png', as_attachment=True, download_name='qrcode.png')
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -12,25 +12,56 @@
     <div class="container">
         <h1>Gerador de QR Code</h1>
         <input type="text" id="text-input" placeholder="Cole aqui seu Link">
-        <button onclick="generateQR()">Gerar QR Code</button>
+        <button class="GerarQR" onclick="generateQR()">Gerar QR Code</button>
         <div id="qrcode"></div>
-      </div>
+        <button class="BaixarQR" id="BaixarQR" onclick="downloadQR()">Baixar QR Code</button>
+    </div>
 
-      <script>
+    <script>
         function generateQR() {
-          const text = document.getElementById('text-input').value;
-          if (text) {
-            document.getElementById('qrcode').innerHTML = '';
-            new QRCode(document.getElementById('qrcode'), {
-              text: text,
-              width: 128,
-              height: 128,
-              colorDark: '#000000',
-              colorLight: '#ffffff',
-              correctLevel: QRCode.CorrectLevel.H
-            });
-          }
+            const text = document.getElementById('text-input').value;
+
+            if (text) {
+                document.getElementById('qrcode').innerHTML = '';
+                new QRCode(document.getElementById('qrcode'), {
+                    text: text,
+                    width: 128,
+                    height: 128,
+                    colorDark: '#000000',
+                    colorLight: '#ffffff',
+                    correctLevel: QRCode.CorrectLevel.H
+                });
+                // Torna o botão visível após gerar o QR Code
+                document.getElementById('BaixarQR').style.visibility = 'visible';
+            }
         }
-      </script>
+
+        function downloadQR() {
+            const text = document.getElementById('text-input').value;
+
+            if (text) {
+                // Cria um formulário para enviar os dados
+                const formData = new FormData();
+                formData.append('data', text);
+
+                // Envia o formulário para o backend e faz o download do arquivo
+                fetch('/generate', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.blob())
+                .then(blob => {
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'qrcode.png';
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+                })
+                .catch(error => console.error('Erro ao baixar o QR Code:', error));
+            }
+        }
+    </script>
 </body>
 </html>
