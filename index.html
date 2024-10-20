@@ -37,29 +37,28 @@
         }
 
         function downloadQR() {
-            const text = document.getElementById('text-input').value;
+            const qrCanvas = document.querySelector('#qrcode canvas');
 
-            if (text) {
-                // Cria um formulário para enviar os dados
-                const formData = new FormData();
-                formData.append('data', text);
+            if (qrCanvas) {
+                // Cria um canvas auxiliar para converter para JPG
+                const tempCanvas = document.createElement('canvas');
+                const ctx = tempCanvas.getContext('2d');
+                tempCanvas.width = qrCanvas.width;
+                tempCanvas.height = qrCanvas.height;
 
-                // Envia o formulário para o backend e faz o download do arquivo
-                fetch('/generate', {
-                    method: 'POST',
-                    body: formData
-                })
-                .then(response => response.blob())
-                .then(blob => {
-                    const url = window.URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = 'qrcode.png';
-                    document.body.appendChild(a);
-                    a.click();
-                    a.remove();
-                })
-                .catch(error => console.error('Erro ao baixar o QR Code:', error));
+                // Desenha a imagem original no canvas auxiliar
+                ctx.fillStyle = '#ffffff'; // Fundo branco
+                ctx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+                ctx.drawImage(qrCanvas, 0, 0);
+
+                // Converte o canvas para um Data URL em formato JPG
+                const jpgDataUrl = tempCanvas.toDataURL('image/jpeg', 1.0);
+                const a = document.createElement('a');
+                a.href = jpgDataUrl;
+                a.download = 'qrcode.jpg';
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
             }
         }
     </script>
